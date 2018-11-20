@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="stylesheet" type="text/css" href="css/style.css">
+	<title>labo9</title>
+</head>
+<body>
+<div class="page">
+	<div class="chat-only">
+		<div class="chat">
+			<div class="chat-window">
+				<ul id="messageWindow" class="chat-messages"></ul>
+				<form class="form-styling" name="chatInputForm">
+					<input type="text" id="textInput" class="chat-input" autocomplete="off" placeholder="Type your message here...">
+					<input type="button" id="sendInput" class="chat-button" onclick="return sendMessage();" value="Send">
+				</form>
+			</div>
+		</div>
+	</div>
+	<div class="options-style">
+		<input type="text" placeholder="You can choose a nickname" id="nickInputField" class="nick-input-field" maxlength="12">
+	</div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+	var socket = io();
+
+	function sendMessage() {
+		if (document.chatInputForm.textInput.value != '') {
+			var messageToSend;
+
+			if (document.getElementById('nickInputField').value != '') {
+				messageToSend = document.getElementById('nickInputField').value + ' : ';
+			} else {
+				messageToSend = "Anonymous user : ";
+			}
+			messageToSend += document.chatInputForm.textInput.value;
+
+			socket.emit('chat message', messageToSend);
+			document.chatInputForm.textInput.value = '';
+			return false;
+		}
+		else {
+			return false;
+		}
+	}
+
+	socket.on('chat message', function(message) {
+		var messageWindow = document.getElementById('messageWindow');
+		var newMessage = document.createElement('li');
+
+		newMessage.innerText = message;
+		newMessage.classList.add('single-message');
+		messageWindow.append(newMessage);
+		messageWindow.scrollTop = messageWindow.scrollHeight;
+	});
+</script>
+</body>
+</html>
